@@ -7,8 +7,19 @@
         <AppFilter :updateFilterHandler="updateFilterHandler" :filterName="filter" />
 
       </div>
-      <MovieList :movies="onFilterHandler(onSearchHandler(movies, term), filter)" @onLike="onLikeHandler"
+      <div v-if="!movies.length">
+        <p class="text-center fs-3 text-warning"> Kinolar mavjud emas</p>
+      </div>
+      <MovieList v-else :movies="onFilterHandler(onSearchHandler(movies, term), filter)" @onLike="onLikeHandler"
         @onFavourite="onFavouriteHandler" @onDelete="onMovieDelete" />
+      <nav aria-label="pagination" class="d-flex justify-content-center">
+        <ul class="pagination pagination-sm">
+          <li v-for="pageNumber in totalPages" :class="{ 'active': pageNumber == page }" :key="pageNumber"
+            @click="changePageHandler(pageNumber)">
+            <span class="page-link"> {{ pageNumber }} </span>
+          </li>
+        </ul>
+      </nav>
       <MovieAddForm @createMovie="createMovie" />
     </div>
   </div>
@@ -20,6 +31,7 @@ import SearchPanel from '@/components/search-panel/SearchPanel.vue'
 import AppFilter from '@/components/app-filter/AppFilter.vue'
 import MovieList from '../movie-list/MovieList.vue';
 import MovieAddForm from "../movie-add-form/MovieAddForm.vue"
+import axios from 'axios'
 
 export default {
   components: {
@@ -32,20 +44,18 @@ export default {
 
   data() {
     return {
-      movies: [
-        { name: "Titanik", views: 987, favourite: true, like: false, id: 1 },
-        { name: "Intersstellar", views: 780, favourite: false, like: true, id: 2 },
-        { name: "Ronaldo", views: 990, favourite: false, like: false, id: 3 },
-        { name: "Real Madrid", views: 999, favourite: false, like: true, id: 4 },
-        { name: "UEFA Champions League", views: 900, favourite: true, like: true, id: 5 },
-      ],
-
+      movies: [],
+      limit: 10,
+      page: 1,
       term: '',
       filter: 'popular',
+      totalPages: 0,
     }
   },
 
   methods: {
+
+
     createMovie(item) {
       this.movies.push(item)
     },
@@ -95,6 +105,54 @@ export default {
 
     updateFilterHandler(filter) {
       this.filter = filter
+    },
+
+    async onFetchMovies() {
+      try {
+        console.log('started')
+        const response = await axios.get('https://jsonplaceholder.typicode.com/posts',
+          {
+            params: {
+              _limit: this.limit,
+              _page: this.page
+            },
+          }
+
+        )
+        const data = response.data
+        console.log(data)
+
+        const newArr = data.map(e => ({
+          id: e['id'],
+          name: e['title'],
+          like: false,
+          favourite: false,
+          views: e['id'] * 77
+        }))
+
+        this.totalPages = Math.ceil(response.headers['x-total-count'] / this.limit)
+        this.movies = newArr
+        console.log('ended')
+
+      } catch (error) {
+        alert(error.message)
+      }
+    },
+
+    changePageHandler(page) {
+      this.page = page
+    },
+
+
+  },
+  mounted() {
+    console.log("mounted")
+    this.onFetchMovies()
+  },
+
+  watch: {
+    page() {
+      this.onFetchMovies()
     }
   }
 }
