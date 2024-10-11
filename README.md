@@ -1,29 +1,23 @@
-# movie
+# Movie To Do App
 
-This template should help get you started developing with Vue 3 in Vite.
+sammi.ac ning Vue Js kursida qilingan "Movie To Do App"
 
-## Recommended IDE Setup
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
+## Ishlab chiqishni boshlash
 
 ```sh
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+### Loyihani run qilish
 
 ```sh
 npm run dev
 ```
 
-### Compile and Minify for Production
+### Loyihani publishga chiqarish
 
 ```sh
 npm run build
 ```
+
+Publish qilingan manzil: https://movie-todo-app.vercel.app/
